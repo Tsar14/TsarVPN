@@ -7,29 +7,30 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #121212;
+            color: #ffffff;
             padding: 20px;
         }
         .container {
             max-width: 600px;
             margin: 0 auto;
-            background: #fff;
+            background: #1e1e1e;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
         h1 {
             text-align: center;
-            color: #333;
+            color: #ffffff;
         }
         .subscription-info {
-            background: #e9ecef;
+            background: #2c2c2c;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
         }
         .tariff {
-            background: #f8f9fa;
+            background: #2c2c2c;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 10px;
@@ -37,19 +38,40 @@
             transition: background 0.3s;
         }
         .tariff:hover {
-            background: #e9ecef;
+            background: #3c3c3c;
         }
         .tariff h3 {
             margin: 0;
-            color: #333;
+            color: #ffffff;
         }
         .tariff p {
             margin: 5px 0;
-            color: #666;
+            color: #b0b0b0;
         }
         .tariff .price {
             font-size: 1.2em;
             color: #28a745;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ffffff;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background: #2c2c2c;
+            color: #ffffff;
+            font-size: 1em;
+        }
+        .input-group input:focus {
+            border-color: #28a745;
+            outline: none;
         }
         .button {
             display: block;
@@ -67,6 +89,19 @@
         .button:hover {
             background: #218838;
         }
+        .button.secondary {
+            background: #444;
+            margin-top: 10px;
+        }
+        .button.secondary:hover {
+            background: #555;
+        }
+        .error-message {
+            color: #ff4444;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -78,20 +113,33 @@
         </div>
         <h2>Выберите тариф</h2>
         <div class="tariff" onclick="selectTariff('basic')">
-            <h3>Базовый</h3>
+            <h3>Базовый (30 дней)</h3>
             <p>Доступ к базовым функциям</p>
             <p class="price">$5/месяц</p>
         </div>
         <div class="tariff" onclick="selectTariff('standard')">
-            <h3>Стандартный</h3>
+            <h3>Стандартный (30 дней)</h3>
             <p>Доступ к расширенным функциям</p>
             <p class="price">$10/месяц</p>
         </div>
         <div class="tariff" onclick="selectTariff('premium')">
-            <h3>Премиум</h3>
+            <h3>Премиум (30 дней)</h3>
             <p>Полный доступ ко всем функциям</p>
             <p class="price">$15/месяц</p>
         </div>
+
+        <div class="input-group">
+            <label for="email">Электронная почта</label>
+            <input type="email" id="email" placeholder="Введите вашу почту">
+            <div class="error-message" id="email-error">Пожалуйста, введите корректный email.</div>
+        </div>
+
+        <div class="input-group">
+            <label for="promo">Промокод</label>
+            <input type="text" id="promo" placeholder="Введите промокод">
+            <button class="button secondary" onclick="applyPromo()">Применить промокод</button>
+        </div>
+
         <button class="button" onclick="proceedToPayment()">Перейти к оплате</button>
     </div>
 
@@ -103,13 +151,37 @@
             alert(`Выбран тариф: ${tariff}`);
         }
 
+        function validateEmail(email) {
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return regex.test(email);
+        }
+
+        function applyPromo() {
+            const promoCode = document.getElementById('promo').value;
+            if (promoCode) {
+                alert(`Промокод "${promoCode}" применен!`);
+            } else {
+                alert('Введите промокод.');
+            }
+        }
+
         function proceedToPayment() {
+            const email = document.getElementById('email').value;
+            const emailError = document.getElementById('email-error');
+
+            if (!validateEmail(email)) {
+                emailError.style.display = 'block';
+                return;
+            } else {
+                emailError.style.display = 'none';
+            }
+
             if (!selectedTariff) {
                 alert('Пожалуйста, выберите тариф перед оплатой.');
                 return;
             }
-            // Здесь можно добавить логику для перехода к оплате
-            alert(`Оплата тарифа: ${selectedTariff}`);
+
+            alert(`Оплата тарифа: ${selectedTariff}\nEmail: ${email}`);
         }
 
         // Инициализация Telegram Web App
