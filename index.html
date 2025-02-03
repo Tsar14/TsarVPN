@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подписки</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .subscription-info {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .tariff {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .tariff:hover {
+            background: #e9ecef;
+        }
+        .tariff h3 {
+            margin: 0;
+            color: #333;
+        }
+        .tariff p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .tariff .price {
+            font-size: 1.2em;
+            color: #28a745;
+        }
+        .button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #28a745;
+            color: #fff;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+        .button:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ваша подписка</h1>
+        <div class="subscription-info">
+            <p>Текущая подписка: <strong>Премиум</strong></p>
+            <p>Срок действия: <strong>до 31.12.2023</strong></p>
+        </div>
+        <h2>Выберите тариф</h2>
+        <div class="tariff" onclick="selectTariff('basic')">
+            <h3>Базовый</h3>
+            <p>Доступ к базовым функциям</p>
+            <p class="price">$5/месяц</p>
+        </div>
+        <div class="tariff" onclick="selectTariff('standard')">
+            <h3>Стандартный</h3>
+            <p>Доступ к расширенным функциям</p>
+            <p class="price">$10/месяц</p>
+        </div>
+        <div class="tariff" onclick="selectTariff('premium')">
+            <h3>Премиум</h3>
+            <p>Полный доступ ко всем функциям</p>
+            <p class="price">$15/месяц</p>
+        </div>
+        <button class="button" onclick="proceedToPayment()">Перейти к оплате</button>
+    </div>
+
+    <script>
+        let selectedTariff = null;
+
+        function selectTariff(tariff) {
+            selectedTariff = tariff;
+            alert(`Выбран тариф: ${tariff}`);
+        }
+
+        function proceedToPayment() {
+            if (!selectedTariff) {
+                alert('Пожалуйста, выберите тариф перед оплатой.');
+                return;
+            }
+            // Здесь можно добавить логику для перехода к оплате
+            alert(`Оплата тарифа: ${selectedTariff}`);
+        }
+
+        // Инициализация Telegram Web App
+        Telegram.WebApp.ready();
+
+        // Показываем кнопку "Закрыть" в Telegram Web App
+        Telegram.WebApp.MainButton.setText("Закрыть")
+            .show()
+            .onClick(function() {
+                Telegram.WebApp.close();
+            });
+    </script>
+</body>
+</html>
