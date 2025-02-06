@@ -181,7 +181,44 @@
                 return;
             }
 
-            alert(`Оплата тарифа: ${selectedTariff}\nEmail: ${email}`);
+            // Имитация успешной оплаты
+            const accessKey = generateAccessKey(); // Генерация ключа
+            showSuccessModal(accessKey);
+        }
+
+        function generateAccessKey() {
+            // Генерация случайного ключа (для примера)
+            return 'OUTLINE-' + Math.random().toString(36).substring(2, 15).toUpperCase();
+        }
+
+        function showSuccessModal(accessKey) {
+            // Используем Telegram WebApp API для отображения модального окна
+            Telegram.WebApp.showAlert(
+                `Ваш ключ доступа: ${accessKey}`,
+                [
+                    {
+                        text: 'Скопировать ключ',
+                        callback: () => {
+                            navigator.clipboard.writeText(accessKey).then(() => {
+                                Telegram.WebApp.showAlert('Ключ скопирован!');
+                            });
+                        }
+                    },
+                    {
+                        text: 'Инструкция',
+                        callback: () => {
+                            Telegram.WebApp.showAlert(`
+                                Инструкция по использованию Outline:
+                                1. Скачайте приложение Outline.
+                                2. Откройте приложение и нажмите "Добавить сервер".
+                                3. Вставьте ваш ключ доступа.
+                                4. Нажмите "Подключиться".
+                                5. Готово! Вы подключены к серверу.
+                            `);
+                        }
+                    }
+                ]
+            );
         }
 
         // Инициализация Telegram Web App
