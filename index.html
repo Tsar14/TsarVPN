@@ -128,19 +128,19 @@
             <p>Срок действия: <strong>до 31.12.2023</strong></p>
         </div>
         <h2>Выберите тариф</h2>
-        <div class="tariff" onclick="selectTariff('basic')">
+        <div class="tariff" data-tariff="basic" onclick="selectTariff('basic')">
             <div class="select-circle"></div>
             <h3>Базовый (30 дней)</h3>
             <p>150 руб, ограничение 15 ГБ, высокая скорость</p>
             <p class="price">150 руб/месяц</p>
         </div>
-        <div class="tariff" onclick="selectTariff('standard')">
+        <div class="tariff" data-tariff="standard" onclick="selectTariff('standard')">
             <div class="select-circle"></div>
             <h3>Стандартный (30 дней)</h3>
             <p>250 руб, ограничение 30 ГБ, высокая скорость</p>
             <p class="price">250 руб/месяц</p>
         </div>
-        <div class="tariff" onclick="selectTariff('premium')">
+        <div class="tariff" data-tariff="premium" onclick="selectTariff('premium')">
             <div class="select-circle"></div>
             <h3>Премиум (30 дней)</h3>
             <p>300 руб, ограничение 50 ГБ, высокая скорость</p>
@@ -167,8 +167,17 @@
 
         function selectTariff(tariff) {
             selectedTariff = tariff;
-            document.querySelectorAll('.tariff').forEach(t => t.classList.remove('selected'));
-            event.currentTarget.classList.add('selected');
+
+            // Убираем выделение у всех тарифов
+            document.querySelectorAll('.tariff').forEach(t => {
+                t.classList.remove('selected');
+            });
+
+            // Выделяем выбранный тариф
+            const selectedElement = document.querySelector(`.tariff[data-tariff="${tariff}"]`);
+            if (selectedElement) {
+                selectedElement.classList.add('selected');
+            }
         }
 
         function validateEmail(email) {
@@ -204,7 +213,6 @@
             // Получаем данные пользователя из Telegram
             const user = Telegram.WebApp.initDataUnsafe.user;
             const username = user.username || "Unknown";
-            const email = document.getElementById('email').value;
 
             // Генерация ключа
             const accessKey = generateAccessKey();
