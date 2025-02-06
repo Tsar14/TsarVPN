@@ -30,15 +30,18 @@
             margin-bottom: 20px;
         }
         .tariff {
-            background: #2c2c2c;
+            background: linear-gradient(135deg, #2c2c2c, #1e1e1e);
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 10px;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
         }
         .tariff:hover {
-            background: #3c3c3c;
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
         }
         .tariff h3 {
             margin: 0;
@@ -51,6 +54,19 @@
         .tariff .price {
             font-size: 1.2em;
             color: #28a745;
+        }
+        .tariff .select-circle {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #28a745;
+            border-radius: 50%;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            transition: background 0.3s;
+        }
+        .tariff.selected .select-circle {
+            background: #28a745;
         }
         .input-group {
             margin-bottom: 15px;
@@ -113,19 +129,22 @@
         </div>
         <h2>Выберите тариф</h2>
         <div class="tariff" onclick="selectTariff('basic')">
+            <div class="select-circle"></div>
             <h3>Базовый (30 дней)</h3>
-            <p>Доступ к базовым функциям</p>
-            <p class="price">$5/месяц</p>
+            <p>150 руб, ограничение 15 ГБ, высокая скорость</p>
+            <p class="price">150 руб/месяц</p>
         </div>
         <div class="tariff" onclick="selectTariff('standard')">
+            <div class="select-circle"></div>
             <h3>Стандартный (30 дней)</h3>
-            <p>Доступ к расширенным функциям</p>
-            <p class="price">$10/месяц</p>
+            <p>250 руб, ограничение 30 ГБ, высокая скорость</p>
+            <p class="price">250 руб/месяц</p>
         </div>
         <div class="tariff" onclick="selectTariff('premium')">
+            <div class="select-circle"></div>
             <h3>Премиум (30 дней)</h3>
-            <p>Полный доступ ко всем функциям</p>
-            <p class="price">$15/месяц</p>
+            <p>300 руб, ограничение 50 ГБ, высокая скорость</p>
+            <p class="price">300 руб/месяц</p>
         </div>
 
         <div class="input-group">
@@ -148,7 +167,8 @@
 
         function selectTariff(tariff) {
             selectedTariff = tariff;
-            alert(`Выбран тариф: ${tariff}`);
+            document.querySelectorAll('.tariff').forEach(t => t.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
         }
 
         function validateEmail(email) {
@@ -165,7 +185,7 @@
             }
         }
 
-        function proceedToPayment() {
+        async function proceedToPayment() {
             const email = document.getElementById('email').value;
             const emailError = document.getElementById('email-error');
 
@@ -181,9 +201,39 @@
                 return;
             }
 
-            // Имитация успешной оплаты
-            const accessKey = generateAccessKey(); // Генерация ключа
-            showSuccessModal(accessKey);
+            // Получаем данные пользователя из Telegram
+            const user = Telegram.WebApp.initDataUnsafe.user;
+            const username = user.username || "Unknown";
+            const email = document.getElementById('email').value;
+
+            // Генерация ключа
+            const accessKey = generateAccessKey();
+
+            // Отправка данных на сервер
+            try {
+                const response = await fetch('https://your-server.com/api/payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        email: email,
+                        tariff: selectedTariff,
+                        accessKey: accessKey,
+                    }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showSuccessModal(accessKey);
+                } else {
+                    alert('Ошибка при обработке оплаты.');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Ошибка при отправке данных на сервер.');
+            }
         }
 
         function generateAccessKey() {
