@@ -162,144 +162,52 @@
         <button class="button" onclick="proceedToPayment()">Перейти к оплате</button>
     </div>
 
-    <script>
-        let selectedTariff = null;
+    <button class="button" onclick="proceedToPayment()">Перейти к оплате</button>
 
-        // Выбор тарифа
-        function selectTariff(tariff) {
-            selectedTariff = tariff;
+<script>
+    async function proceedToPayment() {
+        const email = document.getElementById('email').value;
+        const emailError = document.getElementById('email-error');
 
-            // Убираем выделение у всех тарифов
-            document.querySelectorAll('.tariff').forEach(t => {
-                t.classList.remove('selected');
+        if (!validateEmail(email)) {
+            emailError.style.display = 'block';
+            return;
+        } else {
+            emailError.style.display = 'none';
+        }
+
+        if (!selectedTariff) {
+            alert('Пожалуйста, выберите тариф перед оплатой.');
+            return;
+        }
+
+        const user = Telegram.WebApp.initDataUnsafe.user;
+        const telegram_id = user?.id || "Unknown";
+
+        try {
+            const response = await fetch('http://your-server.com/api/payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    telegram_id: telegram_id,
+                    email: email,
+                    tariff: selectedTariff,
+                }),
             });
 
-            // Выделяем выбранный тариф
-            const selectedElement = document.querySelector(`.tariff[data-tariff="${tariff}"]`);
-            if (selectedElement) {
-                selectedElement.classList.add('selected');
-            }
-
-            console.log(`Выбран тариф: ${tariff}`);
-        }
-
-        // Проверка email
-        function validateEmail(email) {
-            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return regex.test(email);
-        }
-
-        // Применение промокода
-        function applyPromo() {
-            const promoCode = document.getElementById('promo').value;
-            if (promoCode) {
-                alert(`Промокод "${promoCode}" применен!`);
+            if (response.ok) {
+                const data = await response.json();
+                showSuccessModal(data.accessKey);
             } else {
-                alert('Введите промокод.');
+                alert('Ошибка при обработке оплаты.');
             }
+        } catch (error) {
+            console.error('Ошибка:', error);
+            alert('Ошибка при отправке данных на сервер.');
         }
-
-        // Обработка оплаты
-        async function proceedToPayment() {
-            const email = document.getElementById('email').value;
-            const emailError = document.getElementById('email-error');
-
-            // Проверка email
-            if (!validateEmail(email)) {
-                emailError.style.display = 'block';
-                return;
-            } else {
-                emailError.style.display = 'none';
-            }
-
-            // Проверка выбора тарифа
-            if (!selectedTariff) {
-                alert('Пожалуйста, выберите тариф перед оплатой.');
-                return;
-            }
-
-            // Получаем данные пользователя из Telegram
-            const user = Telegram.WebApp.initDataUnsafe.user;
-            const username = user?.username || "Unknown";
-
-            // Генерация ключа
-            const accessKey = generateAccessKey();
-
-            // Имитация отправки данных на сервер
-            try {
-                console.log("Отправка данных на сервер...");
-                const response = await fetch('https://your-server.com/api/payment', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        username: username,
-                        email: email,
-                        tariff: selectedTariff,
-                        accessKey: accessKey,
-                    }),
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log("Данные успешно отправлены:", data);
-                    showSuccessModal(accessKey);
-                } else {
-                    console.error("Ошибка при отправке данных:", response.statusText);
-                    alert('Ошибка при обработке оплаты.');
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                alert('Ошибка при отправке данных на сервер.');
-            }
-        }
-
-        // Генерация ключа
-        function generateAccessKey() {
-            return 'OUTLINE-' + Math.random().toString(36).substring(2, 15).toUpperCase();
-        }
-
-        // Показ модального окна с ключом
-        function showSuccessModal(accessKey) {
-            Telegram.WebApp.showAlert(
-                `Ваш ключ доступа: ${accessKey}`,
-                [
-                    {
-                        text: 'Скопировать ключ',
-                        callback: () => {
-                            navigator.clipboard.writeText(accessKey).then(() => {
-                                Telegram.WebApp.showAlert('Ключ скопирован!');
-                            });
-                        }
-                    },
-                    {
-                        text: 'Инструкция',
-                        callback: () => {
-                            Telegram.WebApp.showAlert(`
-                                Инструкция по использованию Outline:
-                                1. Скачайте приложение Outline.
-                                2. Откройте приложение и нажмите "Добавить сервер".
-                                3. Вставьте ваш ключ доступа.
-                                4. Нажмите "Подключиться".
-                                5. Готово! Вы подключены к серверу.
-                            `);
-                        }
-                    }
-                ]
-            );
-        }
-
-        // Инициализация Telegram Web App
-        Telegram.WebApp.ready();
-        console.log("Telegram WebApp инициализирован.");
-
-        // Показываем кнопку "Закрыть" в Telegram Web App
-        Telegram.WebApp.MainButton.setText("Закрыть")
-            .show()
-            .onClick(function() {
-                Telegram.WebApp.close();
-            });
-    </script>
+    }
+</script>
 </body>
 </html>
